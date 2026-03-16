@@ -6,7 +6,6 @@
     <title>Our Private Space ❤️</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
@@ -193,27 +192,6 @@
 
         .error-msg { color: #ff4d7d; font-size: 0.8rem; margin-top: 10px; display: none; }
         
-        .delete-indicator {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: red;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: 0.3s;
-        }
-        
-        .message:hover .delete-indicator {
-            opacity: 1;
-        }
-
         .typing-indicator {
             font-size: 12px;
             color: var(--primary-pink);
@@ -249,21 +227,28 @@
     </div>
 
     <script>
-        // Firebase Configuration
+        // REPLACE THESE WITH YOUR ACTUAL FIREBASE CONFIG FROM THE CONSOLE
         const firebaseConfig = {
-            apiKey: "AIzaSyB7kM3kQqWqWqWqWqWqWqWqWqWqWqWqWqWq", // This is a placeholder - you'll need to create your own
-            authDomain: "your-chat-app.firebaseapp.com",
-            projectId: "your-chat-app",
-            storageBucket: "your-chat-app.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abc123def456"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
-        // Password Check Logic
+        // Use a persistent User ID
+        let currentUser = localStorage.getItem('chat_user_id');
+        if (!currentUser) {
+            currentUser = 'user_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('chat_user_id', currentUser);
+        }
+
+        // Password Check
         function checkPassword() {
             const pass = document.getElementById('pass-input').value;
             if (pass === "12321") {
@@ -278,7 +263,7 @@
             }
         }
 
-        // Generate Hearts
+        // Hearts Animation
         function createHeart() {
             const heart = document.createElement('div');
             heart.classList.add('heart');
@@ -288,58 +273,33 @@
             document.getElementById('hearts-container').appendChild(heart);
             setTimeout(() => heart.remove(), 6000);
         }
-        setInterval(createHeart, 500);
+        setInterval(createHeart, 600);
 
-        // Chat Logic
+        // Chat Variables
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
         const typingIndicator = document.getElementById('typingIndicator');
         const onlineStatus = document.getElementById('online-status');
-        
-        let currentUser = localStorage.getItem('userId') || generateUserId();
         let typingTimeout;
-        
-        function generateUserId() {
-            const userId = 'user_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('userId', userId);
-            return userId;
-        }
 
         function initializeChat() {
             onlineStatus.textContent = 'Connected 💕';
             
-            // Load messages in real-time
+            // Real-time Message Listener
             db.collection('messages')
-              .orderBy('timestamp')
+              .orderBy('timestamp', 'asc')
               .onSnapshot((snapshot) => {
                   chatBox.innerHTML = '';
                   snapshot.forEach((doc) => {
                       const msg = doc.data();
-                      appendMessage(msg.text, msg.userId === currentUser ? 'me' : 'you', msg.timestamp, doc.id);
+                      const type = msg.userId === currentUser ? 'me' : 'you';
+                      appendMessage(msg.text, type, msg.timestamp, doc.id);
                   });
                   chatBox.scrollTop = chatBox.scrollHeight;
               });
 
-            // Typing indicator
-            userInput.addEventListener('input', () => {
-                db.collection('typing').doc('status').set({
-                    userId: currentUser,
-                    isTyping: true,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                clearTimeout(typingTimeout);
-                typingTimeout = setTimeout(() => {
-                    db.collection('typing').doc('status').set({
-                        userId: currentUser,
-                        isTyping: false,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }, 1000);
-            });
-
-            // Listen for typing status
-            db.collection('typing').doc('status').onSnapshot((doc) => {
+            // Typing Status Listener
+            db.collection('status').doc('typing').onSnapshot((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
                     if (data.isTyping && data.userId !== currentUser) {
@@ -349,13 +309,24 @@
                     }
                 }
             });
+
+            // Send typing signal
+            userInput.addEventListener('input', () => {
+                db.collection('status').doc('typing').set({
+                    userId: currentUser,
+                    isTyping: true
+                });
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    db.collection('status').doc('typing').set({ isTyping: false });
+                }, 2000);
+            });
         }
 
         function sendMessage() {
             const text = userInput.value.trim();
             if (text === "") return;
             
-            // Save to Firebase
             db.collection('messages').add({
                 text: text,
                 userId: currentUser,
@@ -363,27 +334,20 @@
             });
             
             userInput.value = "";
-            
-            // Clear typing indicator
-            db.collection('typing').doc('status').set({
-                userId: currentUser,
-                isTyping: false,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            db.collection('status').doc('typing').set({ isTyping: false });
         }
 
         function appendMessage(text, type, timestamp, messageId) {
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('message', type);
             
-            // Message text
             const textSpan = document.createElement('span');
             textSpan.innerText = text;
             msgDiv.appendChild(textSpan);
             
-            // Time
             const timeSpan = document.createElement('div');
             timeSpan.classList.add('message-time');
+            
             if (timestamp) {
                 const date = timestamp.toDate();
                 timeSpan.innerText = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -392,13 +356,13 @@
             }
             msgDiv.appendChild(timeSpan);
 
-            // Delete functionality (only for your own messages)
+            // Click to delete own messages
             if (type === 'me') {
-                msgDiv.addEventListener('click', () => {
-                    if (confirm('Delete this message?')) {
+                msgDiv.onclick = () => {
+                    if (confirm("Delete this message?")) {
                         db.collection('messages').doc(messageId).delete();
                     }
-                });
+                };
             }
 
             chatBox.appendChild(msgDiv);
@@ -407,15 +371,6 @@
         userInput.addEventListener("keypress", (e) => { 
             if (e.key === "Enter") sendMessage(); 
         });
-
-        // Note: You need to replace the firebaseConfig with your own Firebase project details
-        // Go to https://console.firebase.google.com/ to create a free project
-        console.log('To make this work across devices:');
-        console.log('1. Go to https://console.firebase.google.com/');
-        console.log('2. Create a new project');
-        console.log('3. Register a web app');
-        console.log('4. Copy your config and replace the firebaseConfig object above');
-        console.log('5. Enable Firestore Database in the Firebase Console');
     </script>
 </body>
 </html>
