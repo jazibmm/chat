@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Private Space</title>
+    <title>Our Private Space ❤️</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
     <style>
         :root {
             --primary-pink: #ff85a2;
@@ -97,6 +102,13 @@
             color: white;
             text-align: center;
             font-weight: 600;
+            position: relative;
+        }
+
+        .online-status {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 5px;
         }
 
         #chat-box {
@@ -116,8 +128,9 @@
             font-size: 0.9rem;
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
-            user-select: none; /* Prevents text selection during long press */
+            user-select: none;
             position: relative;
+            word-wrap: break-word;
         }
 
         @keyframes popIn {
@@ -125,10 +138,34 @@
             to { transform: scale(1); opacity: 1; }
         }
 
-        .message.me { align-self: flex-end; background: var(--primary-pink); color: white; border-bottom-right-radius: 5px; }
-        .message.you { align-self: flex-start; background: var(--chat-bubble-you); color: var(--text-color); border-bottom-left-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .message.me { 
+            align-self: flex-end; 
+            background: var(--primary-pink); 
+            color: white; 
+            border-bottom-right-radius: 5px; 
+        }
+        
+        .message.you { 
+            align-self: flex-start; 
+            background: var(--chat-bubble-you); 
+            color: var(--text-color); 
+            border-bottom-left-radius: 5px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+        }
 
-        .chat-input-area { padding: 20px; background: white; display: flex; gap: 10px; }
+        .message-time {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .chat-input-area { 
+            padding: 20px; 
+            background: white; 
+            display: flex; 
+            gap: 10px; 
+        }
         
         input {
             flex: 1;
@@ -136,6 +173,7 @@
             padding: 12px;
             border-radius: 20px;
             outline: none;
+            font-family: 'Poppins', sans-serif;
         }
 
         button {
@@ -146,9 +184,42 @@
             border-radius: 20px;
             cursor: pointer;
             transition: 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        button:hover {
+            transform: scale(1.05);
         }
 
         .error-msg { color: #ff4d7d; font-size: 0.8rem; margin-top: 10px; display: none; }
+        
+        .delete-indicator {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: red;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: 0.3s;
+        }
+        
+        .message:hover .delete-indicator {
+            opacity: 1;
+        }
+
+        .typing-indicator {
+            font-size: 12px;
+            color: var(--primary-pink);
+            padding: 5px 15px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -157,23 +228,41 @@
 
     <div id="login-overlay">
         <div class="login-card">
-            <h2 style="color: var(--primary-pink); margin-bottom: 15px;">Enter Code</h2>
-            <input type="password" id="pass-input" placeholder="Hint: Our secret..." style="text-align: center; margin-bottom: 10px;">
+            <h2 style="color: var(--primary-pink); margin-bottom: 15px;">Enter Code 💕</h2>
+            <input type="password" id="pass-input" placeholder="Our secret number..." style="text-align: center; margin-bottom: 10px;">
             <button onclick="checkPassword()" style="width: 100%;">Open Heart</button>
             <p id="error" class="error-msg">Incorrect code, try again! ❤️</p>
         </div>
     </div>
 
     <div class="chat-container" id="main-chat">
-        <div class="chat-header">💖 Our Sweet Chat 💖</div>
+        <div class="chat-header">
+            💖 Our Sweet Chat 💖
+            <div class="online-status" id="online-status">Connecting...</div>
+        </div>
         <div id="chat-box"></div>
+        <div class="typing-indicator" id="typingIndicator" style="display: none;">Someone is typing...</div>
         <div class="chat-input-area">
-            <input type="text" id="user-input" placeholder="Type a message...">
+            <input type="text" id="user-input" placeholder="Type a message..." autocomplete="off">
             <button onclick="sendMessage()">Send</button>
         </div>
     </div>
 
     <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB7kM3kQqWqWqWqWqWqWqWqWqWqWqWqWqWq", // This is a placeholder - you'll need to create your own
+            authDomain: "your-chat-app.firebaseapp.com",
+            projectId: "your-chat-app",
+            storageBucket: "your-chat-app.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abc123def456"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
         // Password Check Logic
         function checkPassword() {
             const pass = document.getElementById('pass-input').value;
@@ -182,6 +271,7 @@
                 setTimeout(() => {
                     document.getElementById('login-overlay').style.display = 'none';
                     document.getElementById('main-chat').style.display = 'flex';
+                    initializeChat();
                 }, 500);
             } else {
                 document.getElementById('error').style.display = 'block';
@@ -203,71 +293,129 @@
         // Chat Logic
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const onlineStatus = document.getElementById('online-status');
+        
+        let currentUser = localStorage.getItem('userId') || generateUserId();
+        let typingTimeout;
+        
+        function generateUserId() {
+            const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('userId', userId);
+            return userId;
+        }
 
-        window.onload = () => {
-            renderMessages();
-        };
+        function initializeChat() {
+            onlineStatus.textContent = 'Connected 💕';
+            
+            // Load messages in real-time
+            db.collection('messages')
+              .orderBy('timestamp')
+              .onSnapshot((snapshot) => {
+                  chatBox.innerHTML = '';
+                  snapshot.forEach((doc) => {
+                      const msg = doc.data();
+                      appendMessage(msg.text, msg.userId === currentUser ? 'me' : 'you', msg.timestamp, doc.id);
+                  });
+                  chatBox.scrollTop = chatBox.scrollHeight;
+              });
 
-        function renderMessages() {
-            chatBox.innerHTML = '';
-            const messages = JSON.parse(localStorage.getItem('messages')) || [];
-            if (messages.length === 0) {
-                appendMessage("Hi baby! Long-press a message to delete it. ✨", 'you', false);
-            } else {
-                messages.forEach((msg, index) => {
-                    appendMessage(msg.text, msg.type, false, index);
+            // Typing indicator
+            userInput.addEventListener('input', () => {
+                db.collection('typing').doc('status').set({
+                    userId: currentUser,
+                    isTyping: true,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-            }
+
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    db.collection('typing').doc('status').set({
+                        userId: currentUser,
+                        isTyping: false,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }, 1000);
+            });
+
+            // Listen for typing status
+            db.collection('typing').doc('status').onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.isTyping && data.userId !== currentUser) {
+                        typingIndicator.style.display = 'block';
+                    } else {
+                        typingIndicator.style.display = 'none';
+                    }
+                }
+            });
         }
 
         function sendMessage() {
             const text = userInput.value.trim();
             if (text === "") return;
             
-            const messages = JSON.parse(localStorage.getItem('messages')) || [];
-            messages.push({ text, type: 'me' });
-            localStorage.setItem('messages', JSON.stringify(messages));
+            // Save to Firebase
+            db.collection('messages').add({
+                text: text,
+                userId: currentUser,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
             
-            renderMessages();
             userInput.value = "";
+            
+            // Clear typing indicator
+            db.collection('typing').doc('status').set({
+                userId: currentUser,
+                isTyping: false,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
         }
 
-        function appendMessage(text, type, save, index = null) {
+        function appendMessage(text, type, timestamp, messageId) {
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('message', type);
-            msgDiv.innerText = text;
-
-            // Long Press Logic
-            let pressTimer;
             
-            const startPress = () => {
-                pressTimer = setTimeout(() => {
-                    if (confirm("Do you want to delete this message?")) {
-                        deleteMessage(index);
+            // Message text
+            const textSpan = document.createElement('span');
+            textSpan.innerText = text;
+            msgDiv.appendChild(textSpan);
+            
+            // Time
+            const timeSpan = document.createElement('div');
+            timeSpan.classList.add('message-time');
+            if (timestamp) {
+                const date = timestamp.toDate();
+                timeSpan.innerText = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } else {
+                timeSpan.innerText = 'just now';
+            }
+            msgDiv.appendChild(timeSpan);
+
+            // Delete functionality (only for your own messages)
+            if (type === 'me') {
+                msgDiv.addEventListener('click', () => {
+                    if (confirm('Delete this message?')) {
+                        db.collection('messages').doc(messageId).delete();
                     }
-                }, 700);
-            };
-
-            const endPress = () => clearTimeout(pressTimer);
-
-            msgDiv.addEventListener('mousedown', startPress);
-            msgDiv.addEventListener('touchstart', startPress);
-            msgDiv.addEventListener('mouseup', endPress);
-            msgDiv.addEventListener('touchend', endPress);
+                });
+            }
 
             chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        function deleteMessage(index) {
-            if (index === null) return;
-            let messages = JSON.parse(localStorage.getItem('messages')) || [];
-            messages.splice(index, 1);
-            localStorage.setItem('messages', JSON.stringify(messages));
-            renderMessages();
-        }
+        userInput.addEventListener("keypress", (e) => { 
+            if (e.key === "Enter") sendMessage(); 
+        });
 
-        userInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
+        // Note: You need to replace the firebaseConfig with your own Firebase project details
+        // Go to https://console.firebase.google.com/ to create a free project
+        console.log('To make this work across devices:');
+        console.log('1. Go to https://console.firebase.google.com/');
+        console.log('2. Create a new project');
+        console.log('3. Register a web app');
+        console.log('4. Copy your config and replace the firebaseConfig object above');
+        console.log('5. Enable Firestore Database in the Firebase Console');
     </script>
 </body>
 </html>
