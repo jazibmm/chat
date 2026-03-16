@@ -30,7 +30,7 @@
             height: 100vh;
         }
 
-        /* Password Overlay */
+        /* Password & Name Overlay */
         #login-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -49,7 +49,7 @@
             border-radius: 25px;
             box-shadow: 0 10px 25px rgba(255, 133, 162, 0.2);
             text-align: center;
-            width: 280px;
+            width: 300px;
         }
 
         /* Floating Hearts Animation */
@@ -75,7 +75,7 @@
 
         /* Chat Container */
         .chat-container {
-            width: 90%;
+            width: 95%;
             max-width: 400px;
             height: 85vh;
             background: rgba(255, 255, 255, 0.8);
@@ -101,14 +101,9 @@
             color: white;
             text-align: center;
             font-weight: 600;
-            position: relative;
         }
 
-        .online-status {
-            font-size: 12px;
-            opacity: 0.9;
-            margin-top: 5px;
-        }
+        .online-status { font-size: 12px; opacity: 0.9; margin-top: 5px; }
 
         #chat-box {
             flex: 1;
@@ -122,54 +117,28 @@
 
         .message {
             max-width: 80%;
-            padding: 12px 18px;
-            border-radius: 20px;
+            padding: 10px 15px;
+            border-radius: 18px;
             font-size: 0.9rem;
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            user-select: none;
             position: relative;
             word-wrap: break-word;
+            animation: popIn 0.3s ease;
         }
 
-        @keyframes popIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        .message.me { 
-            align-self: flex-end; 
-            background: var(--primary-pink); 
-            color: white; 
-            border-bottom-right-radius: 5px; 
-        }
-        
-        .message.you { 
-            align-self: flex-start; 
-            background: var(--chat-bubble-you); 
-            color: var(--text-color); 
-            border-bottom-left-radius: 5px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-        }
+        .message.me { align-self: flex-end; background: var(--primary-pink); color: white; border-bottom-right-radius: 4px; }
+        .message.you { align-self: flex-start; background: white; color: var(--text-color); border-bottom-left-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
-        .message-time {
-            font-size: 10px;
-            opacity: 0.7;
-            margin-top: 5px;
-            text-align: right;
-        }
+        .sender-name { font-size: 10px; font-weight: 600; margin-bottom: 2px; display: block; opacity: 0.8; }
+        .message-time { font-size: 9px; opacity: 0.7; margin-top: 4px; text-align: right; }
 
-        .chat-input-area { 
-            padding: 20px; 
-            background: white; 
-            display: flex; 
-            gap: 10px; 
-        }
+        .chat-input-area { padding: 15px; background: white; display: flex; gap: 10px; border-top: 1px solid #f0f0f0; }
         
         input {
             flex: 1;
             border: 1px solid #eee;
-            padding: 12px;
+            padding: 10px 15px;
             border-radius: 20px;
             outline: none;
             font-family: 'Poppins', sans-serif;
@@ -179,25 +148,15 @@
             background: var(--primary-pink);
             border: none;
             color: white;
-            padding: 10px 20px;
+            padding: 8px 18px;
             border-radius: 20px;
             cursor: pointer;
-            transition: 0.3s;
             font-family: 'Poppins', sans-serif;
-        }
-
-        button:hover {
-            transform: scale(1.05);
+            font-weight: 600;
         }
 
         .error-msg { color: #ff4d7d; font-size: 0.8rem; margin-top: 10px; display: none; }
-        
-        .typing-indicator {
-            font-size: 12px;
-            color: var(--primary-pink);
-            padding: 5px 15px;
-            font-style: italic;
-        }
+        .typing-indicator { font-size: 11px; color: var(--primary-pink); padding: 5px 20px; font-style: italic; }
     </style>
 </head>
 <body>
@@ -206,10 +165,13 @@
 
     <div id="login-overlay">
         <div class="login-card">
-            <h2 style="color: var(--primary-pink); margin-bottom: 15px;">Enter Code 💕</h2>
-            <input type="password" id="pass-input" placeholder="Our secret number..." style="text-align: center; margin-bottom: 10px;">
-            <button onclick="checkPassword()" style="width: 100%;">Open Heart</button>
-            <p id="error" class="error-msg">Incorrect code, try again! ❤️</p>
+            <h2 style="color: var(--primary-pink); margin-bottom: 20px;">Welcome Back ❤️</h2>
+            
+            <input type="password" id="pass-input" placeholder="Enter Secret Code" style="text-align: center; margin-bottom: 15px; width: 100%;">
+            <input type="text" id="name-input" placeholder="Your Name" style="text-align: center; margin-bottom: 15px; width: 100%;">
+            
+            <button onclick="checkAccess()" style="width: 100%;">Enter Space</button>
+            <p id="error" class="error-msg">Check code or name! ❤️</p>
         </div>
     </div>
 
@@ -219,7 +181,7 @@
             <div class="online-status" id="online-status">Connecting...</div>
         </div>
         <div id="chat-box"></div>
-        <div class="typing-indicator" id="typingIndicator" style="display: none;">Someone is typing...</div>
+        <div class="typing-indicator" id="typingIndicator" style="display: none;"></div>
         <div class="chat-input-area">
             <input type="text" id="user-input" placeholder="Type a message..." autocomplete="off">
             <button onclick="sendMessage()">Send</button>
@@ -227,43 +189,40 @@
     </div>
 
     <script>
-        // REPLACE THESE WITH YOUR ACTUAL FIREBASE CONFIG FROM THE CONSOLE
+        // REPLACE WITH YOUR ACTUAL FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            authDomain: "YOUR_APP.firebaseapp.com",
             projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT.appspot.com",
+            storageBucket: "YOUR_APP.appspot.com",
             messagingSenderId: "YOUR_SENDER_ID",
             appId: "YOUR_APP_ID"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
-        // Use a persistent User ID
-        let currentUser = localStorage.getItem('chat_user_id');
-        if (!currentUser) {
-            currentUser = 'user_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('chat_user_id', currentUser);
-        }
+        let userName = "";
+        let userId = localStorage.getItem('chat_uid') || 'id_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('chat_uid', userId);
 
-        // Password Check
-        function checkPassword() {
+        function checkAccess() {
             const pass = document.getElementById('pass-input').value;
-            if (pass === "12321") {
+            const name = document.getElementById('name-input').value.trim();
+            
+            if (pass === "12321" && name !== "") {
+                userName = name;
                 document.getElementById('login-overlay').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('login-overlay').style.display = 'none';
                     document.getElementById('main-chat').style.display = 'flex';
-                    initializeChat();
+                    startChat();
                 }, 500);
             } else {
                 document.getElementById('error').style.display = 'block';
             }
         }
 
-        // Hearts Animation
         function createHeart() {
             const heart = document.createElement('div');
             heart.classList.add('heart');
@@ -275,102 +234,73 @@
         }
         setInterval(createHeart, 600);
 
-        // Chat Variables
-        const chatBox = document.getElementById('chat-box');
-        const userInput = document.getElementById('user-input');
-        const typingIndicator = document.getElementById('typingIndicator');
-        const onlineStatus = document.getElementById('online-status');
-        let typingTimeout;
+        function startChat() {
+            document.getElementById('online-status').innerText = "Connected 💕";
 
-        function initializeChat() {
-            onlineStatus.textContent = 'Connected 💕';
-            
-            // Real-time Message Listener
-            db.collection('messages')
-              .orderBy('timestamp', 'asc')
-              .onSnapshot((snapshot) => {
-                  chatBox.innerHTML = '';
-                  snapshot.forEach((doc) => {
-                      const msg = doc.data();
-                      const type = msg.userId === currentUser ? 'me' : 'you';
-                      appendMessage(msg.text, type, msg.timestamp, doc.id);
-                  });
-                  chatBox.scrollTop = chatBox.scrollHeight;
-              });
-
-            // Typing Status Listener
-            db.collection('status').doc('typing').onSnapshot((doc) => {
-                if (doc.exists) {
+            // Load Messages
+            db.collection('messages').orderBy('timestamp', 'asc').onSnapshot(snap => {
+                const chatBox = document.getElementById('chat-box');
+                chatBox.innerHTML = '';
+                snap.forEach(doc => {
                     const data = doc.data();
-                    if (data.isTyping && data.userId !== currentUser) {
-                        typingIndicator.style.display = 'block';
-                    } else {
-                        typingIndicator.style.display = 'none';
+                    const isMe = data.uid === userId;
+                    
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = `message ${isMe ? 'me' : 'you'}`;
+                    
+                    const time = data.timestamp ? data.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '...';
+                    
+                    msgDiv.innerHTML = `
+                        <span class="sender-name">${isMe ? 'Me' : data.name}</span>
+                        ${data.text}
+                        <div class="message-time">${time}</div>
+                    `;
+
+                    if (isMe) {
+                        msgDiv.onclick = () => { if(confirm("Delete?")) db.collection('messages').doc(doc.id).delete(); };
                     }
-                }
+
+                    chatBox.appendChild(msgDiv);
+                });
+                chatBox.scrollTop = chatBox.scrollHeight;
             });
 
-            // Send typing signal
-            userInput.addEventListener('input', () => {
-                db.collection('status').doc('typing').set({
-                    userId: currentUser,
-                    isTyping: true
-                });
-                clearTimeout(typingTimeout);
-                typingTimeout = setTimeout(() => {
-                    db.collection('status').doc('typing').set({ isTyping: false });
-                }, 2000);
+            // Typing Logic
+            const input = document.getElementById('user-input');
+            input.addEventListener('input', () => {
+                db.collection('status').doc('typing').set({ name: userName, uid: userId, active: true });
+                clearTimeout(window.tType);
+                window.tType = setTimeout(() => db.collection('status').doc('typing').set({ active: false }), 2000);
+            });
+
+            db.collection('status').doc('typing').onSnapshot(doc => {
+                const data = doc.data();
+                const indicator = document.getElementById('typingIndicator');
+                if (data && data.active && data.uid !== userId) {
+                    indicator.innerText = `${data.name} is typing...`;
+                    indicator.style.display = 'block';
+                } else {
+                    indicator.style.display = 'none';
+                }
             });
         }
 
         function sendMessage() {
-            const text = userInput.value.trim();
-            if (text === "") return;
-            
+            const input = document.getElementById('user-input');
+            const text = input.value.trim();
+            if (!text) return;
+
             db.collection('messages').add({
                 text: text,
-                userId: currentUser,
+                name: userName,
+                uid: userId,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             });
-            
-            userInput.value = "";
-            db.collection('status').doc('typing').set({ isTyping: false });
+            input.value = '';
+            db.collection('status').doc('typing').set({ active: false });
         }
 
-        function appendMessage(text, type, timestamp, messageId) {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message', type);
-            
-            const textSpan = document.createElement('span');
-            textSpan.innerText = text;
-            msgDiv.appendChild(textSpan);
-            
-            const timeSpan = document.createElement('div');
-            timeSpan.classList.add('message-time');
-            
-            if (timestamp) {
-                const date = timestamp.toDate();
-                timeSpan.innerText = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            } else {
-                timeSpan.innerText = 'just now';
-            }
-            msgDiv.appendChild(timeSpan);
-
-            // Click to delete own messages
-            if (type === 'me') {
-                msgDiv.onclick = () => {
-                    if (confirm("Delete this message?")) {
-                        db.collection('messages').doc(messageId).delete();
-                    }
-                };
-            }
-
-            chatBox.appendChild(msgDiv);
-        }
-
-        userInput.addEventListener("keypress", (e) => { 
-            if (e.key === "Enter") sendMessage(); 
-        });
+        document.getElementById('user-input').onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
     </script>
 </body>
 </html>
