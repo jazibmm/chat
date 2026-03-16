@@ -5,302 +5,114 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Private Space ❤️</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
     <style>
-        :root {
-            --primary-pink: #ff85a2;
-            --soft-bg: #fff0f3;
-            --chat-bubble-me: #ffb3c1;
-            --chat-bubble-you: #ffffff;
-            --text-color: #4a4a4a;
-        }
-
+        :root { --p: #ff85a2; --bg: #fff0f3; --txt: #4a4a4a; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--soft-bg);
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        /* Password & Name Overlay */
-        #login-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--soft-bg);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: 0.5s ease;
-        }
-
-        .login-card {
-            background: white;
-            padding: 30px;
-            border-radius: 25px;
-            box-shadow: 0 10px 25px rgba(255, 133, 162, 0.2);
-            text-align: center;
-            width: 300px;
-        }
-
-        /* Floating Hearts Animation */
-        .hearts-bg {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .heart {
-            position: absolute;
-            color: var(--primary-pink);
-            font-size: 20px;
-            animation: float 6s linear infinite;
-            opacity: 0;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
-        }
-
-        /* Chat Container */
-        .chat-container {
-            width: 95%;
-            max-width: 400px;
-            height: 85vh;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(255, 133, 162, 0.2);
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 1;
-            border: 2px solid white;
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .chat-header {
-            padding: 20px;
-            background: var(--primary-pink);
-            color: white;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .online-status { font-size: 12px; opacity: 0.9; margin-top: 5px; }
-
-        #chat-box {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            scrollbar-width: none;
-        }
-
-        .message {
-            max-width: 80%;
-            padding: 10px 15px;
-            border-radius: 18px;
-            font-size: 0.9rem;
-            position: relative;
-            word-wrap: break-word;
-            animation: popIn 0.3s ease;
-        }
-
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        .message.me { align-self: flex-end; background: var(--primary-pink); color: white; border-bottom-right-radius: 4px; }
-        .message.you { align-self: flex-start; background: white; color: var(--text-color); border-bottom-left-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-
-        .sender-name { font-size: 10px; font-weight: 600; margin-bottom: 2px; display: block; opacity: 0.8; }
-        .message-time { font-size: 9px; opacity: 0.7; margin-top: 4px; text-align: right; }
-
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        #login-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 100; display: flex; align-items: center; justify-content: center; transition: 0.5s; }
+        .login-card { background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 25px rgba(255,133,162,0.2); text-align: center; width: 300px; }
+        input { width: 100%; border: 1px solid #eee; padding: 12px; border-radius: 20px; outline: none; margin-bottom: 10px; font-family: 'Poppins'; }
+        button { background: var(--p); border: none; color: white; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; width: 100%; }
+        .chat-container { width: 95%; max-width: 400px; height: 85vh; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-radius: 30px; display: none; flex-direction: column; overflow: hidden; border: 2px solid white; }
+        .chat-header { padding: 20px; background: var(--p); color: white; text-align: center; font-weight: 600; }
+        #chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scrollbar-width: none; }
+        .message { max-width: 80%; padding: 10px 15px; border-radius: 18px; font-size: 0.9rem; position: relative; cursor: pointer; animation: pop 0.3s ease; }
+        .message.me { align-self: flex-end; background: var(--p); color: white; border-bottom-right-radius: 4px; }
+        .message.you { align-self: flex-start; background: white; color: var(--txt); border-bottom-left-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .sender { font-size: 10px; font-weight: 600; display: block; margin-bottom: 2px; opacity: 0.8; }
         .chat-input-area { padding: 15px; background: white; display: flex; gap: 10px; border-top: 1px solid #f0f0f0; }
-        
-        input {
-            flex: 1;
-            border: 1px solid #eee;
-            padding: 10px 15px;
-            border-radius: 20px;
-            outline: none;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        button {
-            background: var(--primary-pink);
-            border: none;
-            color: white;
-            padding: 8px 18px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-        }
-
-        .error-msg { color: #ff4d7d; font-size: 0.8rem; margin-top: 10px; display: none; }
-        .typing-indicator { font-size: 11px; color: var(--primary-pink); padding: 5px 20px; font-style: italic; }
+        @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .hearts-bg { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+        .heart { position: absolute; color: var(--p); animation: float 6s linear infinite; }
+        @keyframes float { 0% { transform: translateY(100vh); opacity: 1; } 100% { transform: translateY(-10vh); opacity: 0; } }
     </style>
 </head>
 <body>
-
     <div class="hearts-bg" id="hearts-container"></div>
-
     <div id="login-overlay">
         <div class="login-card">
-            <h2 style="color: var(--primary-pink); margin-bottom: 20px;">Welcome Back ❤️</h2>
-            
-            <input type="password" id="pass-input" placeholder="Enter Secret Code" style="text-align: center; margin-bottom: 15px; width: 100%;">
-            <input type="text" id="name-input" placeholder="Your Name" style="text-align: center; margin-bottom: 15px; width: 100%;">
-            
-            <button onclick="checkAccess()" style="width: 100%;">Enter Space</button>
-            <p id="error" class="error-msg">Check code or name! ❤️</p>
+            <h2 style="color: var(--p); margin-bottom: 15px;">Enter Space ❤️</h2>
+            <input type="password" id="pass-input" placeholder="Code (12321)">
+            <input type="text" id="name-input" placeholder="Your Name">
+            <button onclick="checkAccess()">Join Chat</button>
         </div>
     </div>
-
     <div class="chat-container" id="main-chat">
-        <div class="chat-header">
-            💖 Our Sweet Chat 💖
-            <div class="online-status" id="online-status">Connecting...</div>
-        </div>
+        <div class="chat-header">💖 Our Sweet Chat 💖</div>
         <div id="chat-box"></div>
-        <div class="typing-indicator" id="typingIndicator" style="display: none;"></div>
         <div class="chat-input-area">
-            <input type="text" id="user-input" placeholder="Type a message..." autocomplete="off">
-            <button onclick="sendMessage()">Send</button>
+            <input type="text" id="user-input" placeholder="Type..." style="margin:0">
+            <button onclick="sendMessage()" style="width: auto;">Send</button>
         </div>
     </div>
 
     <script>
-        // REPLACE WITH YOUR ACTUAL FIREBASE CONFIG
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_APP.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_APP.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTdc8D_A5hsJ4QZjAtGgy8y6a7NjcvmTYyg7TpGvMHrXzpWK5mRLhg4buiheLTmwBK/exec"; // <--- PASTE YOUR URL HERE
         let userName = "";
-        let userId = localStorage.getItem('chat_uid') || 'id_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('chat_uid', userId);
 
         function checkAccess() {
             const pass = document.getElementById('pass-input').value;
             const name = document.getElementById('name-input').value.trim();
-            
             if (pass === "12321" && name !== "") {
                 userName = name;
-                document.getElementById('login-overlay').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('login-overlay').style.display = 'none';
-                    document.getElementById('main-chat').style.display = 'flex';
-                    startChat();
-                }, 500);
-            } else {
-                document.getElementById('error').style.display = 'block';
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('main-chat').style.display = 'flex';
+                loadMessages();
+                setInterval(loadMessages, 4000); 
             }
         }
 
-        function createHeart() {
-            const heart = document.createElement('div');
-            heart.classList.add('heart');
-            heart.innerHTML = '❤️';
-            heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
-            document.getElementById('hearts-container').appendChild(heart);
-            setTimeout(() => heart.remove(), 6000);
-        }
-        setInterval(createHeart, 600);
-
-        function startChat() {
-            document.getElementById('online-status').innerText = "Connected 💕";
-
-            // Load Messages
-            db.collection('messages').orderBy('timestamp', 'asc').onSnapshot(snap => {
+        async function loadMessages() {
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const data = await response.json();
                 const chatBox = document.getElementById('chat-box');
-                chatBox.innerHTML = '';
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    const isMe = data.uid === userId;
-                    
-                    const msgDiv = document.createElement('div');
-                    msgDiv.className = `message ${isMe ? 'me' : 'you'}`;
-                    
-                    const time = data.timestamp ? data.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '...';
-                    
-                    msgDiv.innerHTML = `
-                        <span class="sender-name">${isMe ? 'Me' : data.name}</span>
-                        ${data.text}
-                        <div class="message-time">${time}</div>
-                    `;
-
-                    if (isMe) {
-                        msgDiv.onclick = () => { if(confirm("Delete?")) db.collection('messages').doc(doc.id).delete(); };
-                    }
-
-                    chatBox.appendChild(msgDiv);
-                });
-                chatBox.scrollTop = chatBox.scrollHeight;
-            });
-
-            // Typing Logic
-            const input = document.getElementById('user-input');
-            input.addEventListener('input', () => {
-                db.collection('status').doc('typing').set({ name: userName, uid: userId, active: true });
-                clearTimeout(window.tType);
-                window.tType = setTimeout(() => db.collection('status').doc('typing').set({ active: false }), 2000);
-            });
-
-            db.collection('status').doc('typing').onSnapshot(doc => {
-                const data = doc.data();
-                const indicator = document.getElementById('typingIndicator');
-                if (data && data.active && data.uid !== userId) {
-                    indicator.innerText = `${data.name} is typing...`;
-                    indicator.style.display = 'block';
-                } else {
-                    indicator.style.display = 'none';
+                if (data.length !== chatBox.children.length) {
+                    chatBox.innerHTML = '';
+                    data.forEach(msg => {
+                        const isMe = msg.name === userName;
+                        const div = document.createElement('div');
+                        div.className = `message ${isMe ? 'me' : 'you'}`;
+                        div.innerHTML = `<span class="sender">${isMe ? 'Me' : msg.name}</span>${msg.message}`;
+                        if (isMe) div.onclick = () => deleteMsg(msg.id);
+                        chatBox.appendChild(div);
+                    });
+                    chatBox.scrollTop = chatBox.scrollHeight;
                 }
-            });
+            } catch (e) { console.log("Updating..."); }
         }
 
-        function sendMessage() {
+        async function sendMessage() {
             const input = document.getElementById('user-input');
             const text = input.value.trim();
             if (!text) return;
-
-            db.collection('messages').add({
-                text: text,
-                name: userName,
-                uid: userId,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            const msgId = 'm' + Date.now();
             input.value = '';
-            db.collection('status').doc('typing').set({ active: false });
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ action: 'add', id: msgId, name: userName, message: text })
+            });
+            setTimeout(loadMessages, 500);
         }
 
-        document.getElementById('user-input').onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
+        async function deleteMsg(id) {
+            if (!confirm("Delete?")) return;
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ action: 'delete', id: id })
+            });
+            setTimeout(loadMessages, 500);
+        }
+
+        setInterval(() => {
+            const h = document.createElement('div');
+            h.className = 'heart'; h.innerHTML = '❤️';
+            h.style.left = Math.random() * 100 + 'vw';
+            document.getElementById('hearts-container').appendChild(h);
+            setTimeout(() => h.remove(), 6000);
+        }, 600);
     </script>
 </body>
 </html>
