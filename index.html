@@ -26,7 +26,29 @@
             height: 100vh;
         }
 
-        /* Floating Hearts Animation Background */
+        /* Password Overlay */
+        #login-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--soft-bg);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: 0.5s ease;
+        }
+
+        .login-card {
+            background: white;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(255, 133, 162, 0.2);
+            text-align: center;
+            width: 280px;
+        }
+
+        /* Floating Hearts Animation */
         .hearts-bg {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -51,22 +73,22 @@
         .chat-container {
             width: 90%;
             max-width: 400px;
-            height: 80vh;
+            height: 85vh;
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
             border-radius: 30px;
             box-shadow: 0 10px 30px rgba(255, 133, 162, 0.2);
-            display: flex;
+            display: none; /* Hidden until login */
             flex-direction: column;
             overflow: hidden;
             z-index: 1;
             border: 2px solid white;
-            animation: fadeIn 1s ease-out;
+            animation: fadeIn 0.8s ease-out;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .chat-header {
@@ -75,10 +97,8 @@
             color: white;
             text-align: center;
             font-weight: 600;
-            font-size: 1.2rem;
         }
 
-        /* Messages Area */
         #chat-box {
             flex: 1;
             padding: 20px;
@@ -89,16 +109,12 @@
             scrollbar-width: none;
         }
 
-        #chat-box::-webkit-scrollbar { display: none; }
-
         .message {
             max-width: 80%;
             padding: 12px 18px;
             border-radius: 20px;
             font-size: 0.9rem;
-            line-height: 1.4;
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
         }
 
         @keyframes popIn {
@@ -106,39 +122,19 @@
             to { transform: scale(1); opacity: 1; }
         }
 
-        .message.me {
-            align-self: flex-end;
-            background: var(--chat-bubble-me);
-            color: white;
-            border-bottom-right-radius: 5px;
-        }
+        .message.me { align-self: flex-end; background: var(--chat-bubble-me); color: white; border-bottom-right-radius: 5px; }
+        .message.you { align-self: flex-start; background: var(--chat-bubble-you); color: var(--text-color); border-bottom-left-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
-        .message.you {
-            align-self: flex-start;
-            background: var(--chat-bubble-you);
-            color: var(--text-color);
-            border-bottom-left-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        /* Input Area */
-        .chat-input-area {
-            padding: 20px;
-            background: white;
-            display: flex;
-            gap: 10px;
-        }
-
+        .chat-input-area { padding: 20px; background: white; display: flex; gap: 10px; }
+        
         input {
             flex: 1;
             border: 1px solid #eee;
             padding: 12px;
             border-radius: 20px;
             outline: none;
-            transition: 0.3s;
+            font-family: inherit;
         }
-
-        input:focus { border-color: var(--primary-pink); }
 
         button {
             background: var(--primary-pink);
@@ -150,17 +146,28 @@
             transition: 0.3s;
         }
 
-        button:hover { background: #ff4d7d; transform: scale(1.05); }
+        button:hover { transform: scale(1.05); }
+
+        .error-msg { color: #ff4d7d; font-size: 0.8rem; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 
     <div class="hearts-bg" id="hearts-container"></div>
 
-    <div class="chat-container">
+    <div id="login-overlay">
+        <div class="login-card">
+            <h2 style="color: var(--primary-pink); margin-bottom: 15px;">Enter Code</h2>
+            <input type="password" id="pass-input" placeholder="Hint: Our secret..." style="text-align: center; margin-bottom: 10px;">
+            <button onclick="checkPassword()" style="width: 100%;">Open Heart</button>
+            <p id="error" class="error-msg">Incorrect code, try again! ❤️</p>
+        </div>
+    </div>
+
+    <div class="chat-container" id="main-chat">
         <div class="chat-header">💖 Our Sweet Chat 💖</div>
         <div id="chat-box">
-            <div class="message you">Hi baby! I made this space just for us. ✨</div>
+            <div class="message you">Welcome home, beautiful! ✨</div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="user-input" placeholder="Type a message...">
@@ -169,7 +176,21 @@
     </div>
 
     <script>
-        // 1. Generate Floating Hearts
+        // Password Check Logic
+        function checkPassword() {
+            const pass = document.getElementById('pass-input').value;
+            if (pass === "12321") {
+                document.getElementById('login-overlay').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-overlay').style.display = 'none';
+                    document.getElementById('main-chat').style.display = 'flex';
+                }, 500);
+            } else {
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        // Generate Hearts
         function createHeart() {
             const heart = document.createElement('div');
             heart.classList.add('heart');
@@ -181,22 +202,18 @@
         }
         setInterval(createHeart, 500);
 
-        // 2. Chat Logic
+        // Chat Logic
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
 
-        // Load messages from LocalStorage on startup
         window.onload = () => {
             const savedMessages = JSON.parse(localStorage.getItem('messages')) || [];
-            savedMessages.forEach(msg => {
-                appendMessage(msg.text, msg.type, false);
-            });
+            savedMessages.forEach(msg => appendMessage(msg.text, msg.type, false));
         };
 
         function sendMessage() {
             const text = userInput.value.trim();
             if (text === "") return;
-
             appendMessage(text, 'me', true);
             userInput.value = "";
         }
@@ -206,10 +223,7 @@
             msgDiv.classList.add('message', type);
             msgDiv.innerText = text;
             chatBox.appendChild(msgDiv);
-            
-            // Scroll to bottom
             chatBox.scrollTop = chatBox.scrollHeight;
-
             if (save) {
                 const messages = JSON.parse(localStorage.getItem('messages')) || [];
                 messages.push({ text, type });
@@ -217,10 +231,9 @@
             }
         }
 
-        // Allow "Enter" key to send
-        userInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") sendMessage();
-        });
+        // Allow Enter key
+        document.getElementById('pass-input').addEventListener("keypress", (e) => { if (e.key === "Enter") checkPassword(); });
+        userInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
     </script>
 </body>
 </html>
