@@ -1,176 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Private Space ❤️</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-pink: #ff85a2;
-            --soft-bg: #fff0f3;
-            --chat-bubble-me: #ffb3c1;
-            --chat-bubble-you: #ffffff;
-            --text-color: #4a4a4a;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Private Space ❤️</title>
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--soft-bg); overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-        /* Login Screen */
-        #login-overlay { position: fixed; inset: 0; background: var(--soft-bg); z-index: 100; display: flex; align-items: center; justify-content: center; transition: 0.5s; }
-        .login-card { background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 25px rgba(255,133,162,0.2); text-align: center; width: 300px; }
-        
-        /* Layout */
-        .chat-container { width: 95%; max-width: 400px; height: 85vh; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-radius: 30px; box-shadow: 0 10px 30px rgba(255,133,162,0.2); display: none; flex-direction: column; overflow: hidden; border: 2px solid white; position: relative; z-index: 10; }
-        .chat-header { padding: 20px; background: var(--primary-pink); color: white; text-align: center; font-weight: 600; }
-        #chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scrollbar-width: none; }
-        #chat-box::-webkit-scrollbar { display: none; }
-        
-        /* Messages */
-        .message { max-width: 80%; padding: 10px 15px; border-radius: 18px; font-size: 0.9rem; position: relative; word-wrap: break-word; cursor: pointer; animation: pop 0.3s ease; }
-        @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
-        .message.me { align-self: flex-end; background: var(--primary-pink); color: white; border-bottom-right-radius: 4px; }
-        .message.you { align-self: flex-start; background: white; color: var(--text-color); border-bottom-left-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .sender { font-size: 10px; font-weight: 600; display: block; margin-bottom: 2px; opacity: 0.8; }
-        
-        /* Inputs */
-        input { width: 100%; border: 1px solid #eee; padding: 12px; border-radius: 20px; outline: none; margin-bottom: 10px; font-family: 'Poppins'; }
-        .chat-input-area { padding: 15px; background: white; display: flex; gap: 10px; border-top: 1px solid #f0f0f0; }
-        button { background: var(--primary-pink); border: none; color: white; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; transition: 0.2s; }
-        button:active { transform: scale(0.95); }
+<style>
+:root {
+    --primary-pink: #ff85a2;
+    --soft-bg: #fff0f3;
+    --text-color: #4a4a4a;
+}
 
-        .hearts-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-        .heart { position: absolute; color: var(--primary-pink); animation: float 6s linear infinite; bottom: -50px; }
-        @keyframes float { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-110vh); opacity: 0; } }
-    </style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--soft-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* LOGIN */
+#login-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--soft-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-card {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+}
+
+/* CHAT */
+.chat-container {
+    width: 95%;
+    max-width: 400px;
+    height: 85vh;
+    background: white;
+    border-radius: 20px;
+    display: none;
+    flex-direction: column;
+}
+
+.chat-header {
+    background: var(--primary-pink);
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+#chat-box {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+/* MESSAGES */
+.message {
+    max-width: 75%;
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+}
+
+.me {
+    background: var(--primary-pink);
+    color: white;
+    margin-left: auto;
+}
+
+.you {
+    background: #eee;
+}
+
+.sender {
+    font-size: 10px;
+    display: block;
+}
+
+/* INPUT */
+.chat-input {
+    display: flex;
+    padding: 10px;
+}
+
+button {
+    background: var(--primary-pink);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+</style>
 </head>
+
 <body>
 
-    <div class="hearts-bg" id="hearts-container"></div>
-
-    <div id="login-overlay">
-        <div class="login-card">
-            <h2 style="color: var(--primary-pink); margin-bottom: 15px;">Enter Space ❤️</h2>
-            <input type="password" id="pass-input" placeholder="Secret Code (12321)">
-            <input type="text" id="name-input" placeholder="Your Name">
-            <button onclick="checkAccess()">Join Chat</button>
-        </div>
+<!-- LOGIN -->
+<div id="login-overlay">
+    <div class="login-card">
+        <h2>Enter ❤️</h2>
+        <input type="password" id="pass-input" placeholder="Code (12321)">
+        <input type="text" id="name-input" placeholder="Your Name">
+        <button onclick="checkAccess()">Join</button>
     </div>
+</div>
 
-    <div class="chat-container" id="main-chat">
-        <div class="chat-header">💖 Our Sweet Chat 💖</div>
-        <div id="chat-box"></div>
-        <div class="chat-input-area">
-            <input type="text" id="user-input" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMessage()">
-            <button onclick="sendMessage()">Send</button>
-        </div>
+<!-- CHAT -->
+<div class="chat-container" id="main-chat">
+    <div class="chat-header">💖 Private Chat 💖</div>
+
+    <div id="chat-box"></div>
+
+    <div class="chat-input">
+        <input type="text" id="user-input" placeholder="Message..." style="flex:1">
+        <button onclick="sendMessage()">Send</button>
     </div>
+</div>
 
-    <script>
-        // REPLACE THIS URL with your deployed Web App URL
-        const SCRIPT_URL = "YOUR_WEB_APP_URL_HERE"; 
-        let userName = "";
-        let lastMessageCount = 0;
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyZJ8aPqmIJBt-pQPW3xCRrRI5aMV0tza9_p-6zcmfbaeg8UDpvoAY-W9eSvdk9GLVM/exec";
 
-        function checkAccess() {
-            const pass = document.getElementById('pass-input').value;
-            const name = document.getElementById('name-input').value.trim();
-            if (pass === "12321" && name !== "") {
-                userName = name;
-                document.getElementById('login-overlay').style.display = 'none';
-                document.getElementById('main-chat').style.display = 'flex';
-                loadMessages();
-                setInterval(loadMessages, 3000); // Check for new messages every 3 seconds
-            } else {
-                alert("Incorrect code or name!");
+let userName = "";
+
+/* LOGIN */
+function checkAccess() {
+    const pass = document.getElementById('pass-input').value;
+    const name = document.getElementById('name-input').value.trim();
+
+    if (pass === "12321" && name !== "") {
+        userName = name;
+        document.getElementById('login-overlay').style.display = "none";
+        document.getElementById('main-chat').style.display = "flex";
+
+        loadMessages();
+        setInterval(loadMessages, 3000);
+    } else {
+        alert("Wrong code or name!");
+    }
+}
+
+/* LOAD MESSAGES */
+async function loadMessages() {
+    try {
+        const res = await fetch(SCRIPT_URL);
+        const data = await res.json();
+
+        const chatBox = document.getElementById('chat-box');
+        chatBox.innerHTML = "";
+
+        data.forEach(msg => {
+            if (!msg.message) return;
+
+            const div = document.createElement("div");
+            const isMe = msg.name === userName;
+
+            div.className = "message " + (isMe ? "me" : "you");
+
+            div.innerHTML = `
+                <span class="sender">${isMe ? "Me" : msg.name}</span>
+                ${msg.message}
+            `;
+
+            if (isMe) {
+                div.onclick = () => deleteMsg(msg.id);
             }
-        }
 
-        async function loadMessages() {
-            try {
-                // We add a timestamp to prevent browser caching
-                const response = await fetch(`${SCRIPT_URL}?t=${Date.now()}`);
-                const data = await response.json();
-                const chatBox = document.getElementById('chat-box');
-                
-                // Only update if message count changed
-                if (data.length !== lastMessageCount) {
-                    chatBox.innerHTML = '';
-                    data.forEach(msg => {
-                        if (!msg.message) return;
-                        const isMe = msg.name === userName;
-                        const div = document.createElement('div');
-                        div.className = `message ${isMe ? 'me' : 'you'}`;
-                        div.innerHTML = `<span class="sender">${isMe ? 'Me' : msg.name}</span>${msg.message}`;
-                        
-                        // Delete functionality for own messages
-                        if (isMe) {
-                            div.title = "Click to delete";
-                            div.onclick = () => deleteMsg(msg.id);
-                        }
-                        
-                        chatBox.appendChild(div);
-                    });
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                    lastMessageCount = data.length;
-                }
-            } catch (e) {
-                console.error("Connection error:", e);
-            }
-        }
+            chatBox.appendChild(div);
+        });
 
-        async function sendMessage() {
-            const input = document.getElementById('user-input');
-            const text = input.value.trim();
-            if (!text) return;
+        chatBox.scrollTop = chatBox.scrollHeight;
 
-            const msgId = 'm' + Date.now();
-            input.value = '';
+    } catch (err) {
+        console.log("Load error", err);
+    }
+}
 
-            // Send using text/plain to avoid CORS preflight options check
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify({ action: 'add', id: msgId, name: userName, message: text })
-                });
-                
-                // Optimistic UI: manually trigger a reload shortly after sending
-                setTimeout(loadMessages, 1000);
-            } catch (e) {
-                alert("Failed to send message.");
-            }
-        }
+/* SEND MESSAGE */
+async function sendMessage() {
+    const input = document.getElementById('user-input');
+    const text = input.value.trim();
 
-        async function deleteMsg(id) {
-            if (!confirm("Delete this message?")) return;
-            
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify({ action: 'delete', id: id })
-                });
-                setTimeout(loadMessages, 1000);
-            } catch (e) {
-                alert("Failed to delete.");
-            }
-        }
+    if (!text) return;
 
-        // Background Hearts Logic
-        setInterval(() => {
-            const h = document.createElement('div');
-            h.className = 'heart'; h.innerHTML = '❤️';
-            h.style.left = Math.random() * 100 + 'vw';
-            h.style.fontSize = (Math.random() * 10 + 15) + 'px';
-            h.style.opacity = Math.random();
-            document.getElementById('hearts-container').appendChild(h);
-            setTimeout(() => h.remove(), 6000);
-        }, 600);
-    </script>
+    const msgId = "m" + Date.now();
+    input.value = "";
+
+    try {
+        await fetch(SCRIPT_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                action: "add",
+                id: msgId,
+                name: userName,
+                message: text
+            })
+        });
+
+        loadMessages();
+
+    } catch (err) {
+        console.log("Send error", err);
+    }
+}
+
+/* DELETE MESSAGE */
+async function deleteMsg(id) {
+    if (!confirm("Delete this message?")) return;
+
+    await fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            action: "delete",
+            id: id
+        })
+    });
+
+    loadMessages();
+}
+</script>
+
 </body>
 </html>
