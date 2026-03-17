@@ -122,44 +122,48 @@
         }
 
         async function sendMessage() {
-            const input = document.getElementById('user-input');
-            const text = input.value.trim();
-            if (!text) return;
+    const input = document.getElementById('user-input');
+    const text = input.value.trim();
+    if (!text) return;
 
-            const msgId = 'm' + Date.now();
-            input.value = '';
+    const msgId = 'm' + Date.now();
+    input.value = '';
 
-            // Send using text/plain to avoid CORS preflight options check
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify({ action: 'add', id: msgId, name: userName, message: text })
-                });
-                
-                // Optimistic UI: manually trigger a reload shortly after sending
-                setTimeout(loadMessages, 1000);
-            } catch (e) {
-                alert("Failed to send message.");
-            }
-        }
+    try {
+        await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                action: 'add',
+                id: msgId,
+                name: userName,
+                message: text
+            })
+        });
 
+        loadMessages();
+    } catch (err) {
+        console.error(err);
+    }
+}
         async function deleteMsg(id) {
-            if (!confirm("Delete this message?")) return;
-            
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: JSON.stringify({ action: 'delete', id: id })
-                });
-                setTimeout(loadMessages, 1000);
-            } catch (e) {
-                alert("Failed to delete.");
-            }
-        }
+    if (!confirm("Delete from Google Sheet?")) return;
+
+    await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            action: 'delete',
+            id: id
+        })
+    });
+
+    loadMessages();
+}
 
         // Background Hearts Logic
         setInterval(() => {
