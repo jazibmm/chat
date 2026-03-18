@@ -4,7 +4,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💖</text></svg>">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Private Space ❤️</title>
+    <title>Our Private Space</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -54,7 +54,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <h2 style="color: var(--primary-pink); margin-bottom: 15px;">Enter Space ❤️</h2>
-            <input type="password" id="pass-input" placeholder="Secret Code (12321)">
+            <input type="password" id="pass-input" placeholder="Secret Code">
             <input type="text" id="name-input" placeholder="Your Name">
             <button onclick="checkAccess()">Join Chat</button>
         </div>
@@ -79,7 +79,7 @@ function checkAccess() {
     const pass = document.getElementById('pass-input').value;
     const name = document.getElementById('name-input').value.trim();
 
-    if (pass === "12321" && name !== "") {
+    if (pass === "223311" && name !== "") {
         userName = name;
 
         document.getElementById('login-overlay').style.display = 'none';
