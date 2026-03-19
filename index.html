@@ -15,36 +15,155 @@
             --text-color: #4a4a4a;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--soft-bg); overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--soft-bg); 
+            overflow: hidden; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+        }
 
         /* Login Screen */
-        #login-overlay { position: fixed; inset: 0; background: var(--soft-bg); z-index: 100; display: flex; align-items: center; justify-content: center; transition: 0.5s; }
-        .login-card { background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 25px rgba(255,133,162,0.2); text-align: center; width: 300px; }
+        #login-overlay { 
+            position: fixed; inset: 0; 
+            background: var(--soft-bg); 
+            z-index: 100; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: 0.5s; 
+        }
+        .login-card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 25px; 
+            box-shadow: 8px 8px 15px rgba(255, 188, 219, 0.9);
+            text-align: center; 
+            width: 300px; 
+        }
         
         /* Layout */
-        .chat-container { width: 95%; max-width: 400px; height: 85vh; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-radius: 30px; box-shadow: 0 10px 30px rgba(255,133,162,0.2); display: none; flex-direction: column; overflow: hidden; border: 2px solid white; position: relative; z-index: 10; }
-        .chat-header { padding: 20px; background: var(--primary-pink); color: white; text-align: center; font-weight: 600; }
-        #chat-box { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; scrollbar-width: none; }
-        #chat-box::-webkit-scrollbar { display: none; }
+        .chat-container {
+            width: 95%; 
+            max-width: 400px; 
+            height: 85vh; 
+            background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); 
+            border-radius: 30px; 
+            box-shadow: 8px 8px 15px rgba(255, 188, 219, 0.9);
+            display: none; 
+            flex-direction: column; 
+            overflow: hidden; 
+            border: 2px solid white; 
+            position: relative; 
+            z-index: 10; 
+        }
+        .chat-header { 
+            padding: 20px; 
+            background: var(--primary-pink); 
+            color: white; 
+            text-align: center; 
+            font-weight: 600; 
+        }
+        #chat-box { 
+            flex: 1; 
+            padding: 20px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; gap: 12px; scrollbar-width: none; 
+        }
+        #chat-box::-webkit-scrollbar { 
+            display: none; 
+        }
         
         /* Messages */
-        .message { max-width: 80%; padding: 10px 15px; border-radius: 18px; font-size: 0.9rem; position: relative; word-wrap: break-word; cursor: pointer; animation: pop 0.3s ease; }
-        @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .message { 
+            max-width: 80%; 
+            padding: 10px 15px; 
+            border-radius: 18px; 
+            font-size: 0.9rem; 
+            position: relative;
+            word-wrap: break-word; 
+            cursor: pointer;
+            animation: pop 0.3s ease; 
+        }
+        @keyframes pop { 
+            from { transform: scale(0.8); opacity: 0; } 
+            to { transform: scale(1); opacity: 1; } 
+        }
         
-        .message.me { align-self: flex-end; background: var(--primary-pink); color: white; border-bottom-right-radius: 4px; }
-        .message.you { align-self: flex-start; background: white; color: var(--text-color); border-bottom-left-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .sender { font-size: 10px; font-weight: 600; display: block; margin-bottom: 2px; opacity: 0.8; }
+        .message.me { 
+            align-self: flex-end; 
+            background: var(--primary-pink); 
+            color: white; 
+            border-bottom-right-radius: 4px; 
+        }
+        .message.you { 
+            align-self: flex-start; 
+            background: white; 
+            color: var(--text-color); 
+            border-bottom-left-radius: 4px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+        }
+        .sender { 
+            font-size: 10px; 
+            font-weight: 600; 
+            display: block; 
+            margin-bottom: 2px; 
+            opacity: 0.8; 
+        }
         
         /* Inputs */
-        input { width: 100%; border: 1px solid #eee; padding: 12px; border-radius: 20px; outline: none; margin-bottom: 10px; font-family: 'Poppins'; }
-        .chat-input-area { padding: 15px; background: white; display: flex; gap: 10px; border-top: 1px solid #f0f0f0; }
-        button { background: var(--primary-pink); border: none; color: white; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; transition: 0.2s; }
-        button:active { transform: scale(0.95); }
+        input { 
+            width: 100%; 
+            border: 1px solid #eee; 
+            padding: 12px; 
+            border-radius: 20px; 
+            outline: none; 
+            margin-bottom: 10px;
+            font-family: 'Poppins';
+        }
+        .chat-input-area { 
+            padding: 15px; 
+            background: white; 
+            display: flex; gap: 10px; 
+            border-top: 1px solid #f0f0f0; 
+        }
+        button { 
+            background: var(--primary-pink); 
+            border: none; 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            transition: 0.2s; 
+        }
+        button:active { 
+            transform: scale(0.95); 
+        }
 
-        .hearts-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-        .heart { position: absolute; color: var(--primary-pink); animation: float 6s linear infinite; bottom: -50px; }
-        @keyframes float { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-110vh); opacity: 0; } }
+        .hearts-bg { 
+            position: fixed; inset: 0; 
+            pointer-events: none; 
+            z-index: 0; 
+        }
+        .heart { 
+            position: absolute; 
+            color: var(--primary-pink); 
+            animation: float 6s linear infinite; 
+            bottom: -50px; 
+        }
+        @keyframes float { 0% { 
+            transform: translateY(0); 
+            opacity: 1; } 100% { transform: translateY(-110vh); opacity: 0; }  
+        }
     </style>
 </head>
 <body>
@@ -97,6 +216,10 @@ async function loadMessages() {
         const data = await response.json();
 
         const chatBox = document.getElementById('chat-box');
+
+        // ✅ Detect if user is near bottom
+        const isNearBottom = chatBox.scrollHeight - chatBox.scrollTop <= chatBox.clientHeight + 50;
+
         chatBox.innerHTML = "";
 
         data.forEach(msg => {
@@ -119,7 +242,10 @@ async function loadMessages() {
             chatBox.appendChild(div);
         });
 
-        chatBox.scrollTop = chatBox.scrollHeight;
+        // ✅ Only auto-scroll if already near bottom
+        if (isNearBottom) {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
 
     } catch (e) {
         console.log("Fetch error:", e);
@@ -160,7 +286,7 @@ setInterval(() => {
     h.style.fontSize = (Math.random() * 10 + 15) + 'px';
     document.getElementById('hearts-container').appendChild(h);
     setTimeout(() => h.remove(), 6000);
-}, 600);
+}, 200);
 </script>
 </body>
 </html>
